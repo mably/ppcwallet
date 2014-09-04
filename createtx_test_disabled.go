@@ -12,11 +12,11 @@ package main
 import (
 	"testing"
 
-	"github.com/conformal/btcscript"
-	"github.com/conformal/btcutil"
+	"github.com/mably/btcscript"
+	"github.com/mably/btcutil"
 	"github.com/conformal/btcwallet/tx"
 	"github.com/conformal/btcwallet/wallet"
-	"github.com/conformal/btcwire"
+	"github.com/mably/btcwire"
 )
 
 func init() {

@@ -38,11 +38,11 @@ import (
 	"code.google.com/p/go.crypto/ripemd160"
 
 	"github.com/conformal/btcec"
-	"github.com/conformal/btcnet"
-	"github.com/conformal/btcscript"
-	"github.com/conformal/btcutil"
+	"github.com/mably/btcnet"
+	"github.com/mably/btcscript"
+	"github.com/mably/btcutil"
 	"github.com/conformal/btcwallet/rename"
-	"github.com/conformal/btcwire"
+	"github.com/mably/btcwire"
 )
 
 const (

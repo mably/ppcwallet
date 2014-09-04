@@ -21,13 +21,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/conformal/btcnet"
+	"github.com/mably/btcnet"
 	"github.com/conformal/btcrpcclient"
-	"github.com/conformal/btcutil"
+	"github.com/mably/btcutil"
 	"github.com/conformal/btcwallet/keystore"
 	"github.com/conformal/btcwallet/txstore"
-	"github.com/conformal/btcwire"
-	"github.com/conformal/btcws"
+	"github.com/mably/btcwire"
+	"github.com/mably/btcws"
 )
 
 type Client struct {

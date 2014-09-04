@@ -27,9 +27,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/conformal/btcutil"
+	"github.com/mably/btcutil"
 	"github.com/conformal/btcwallet/rename"
-	"github.com/conformal/btcwire"
+	"github.com/mably/btcwire"
 )
 
 // filename is the name of the file typically used to save a transaction

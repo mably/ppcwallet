@@ -26,14 +26,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/conformal/btcchain"
+	"github.com/mably/btcchain"
 	"github.com/conformal/btcjson"
-	"github.com/conformal/btcnet"
-	"github.com/conformal/btcutil"
+	"github.com/mably/btcnet"
+	"github.com/mably/btcutil"
 	"github.com/conformal/btcwallet/chain"
 	"github.com/conformal/btcwallet/keystore"
 	"github.com/conformal/btcwallet/txstore"
-	"github.com/conformal/btcwire"
+	"github.com/mably/btcwire"
 )
 
 var (

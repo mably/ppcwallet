@@ -41,13 +41,13 @@ import (
 	"github.com/conformal/btcec"
 	"github.com/conformal/btcjson"
 	"github.com/conformal/btcrpcclient"
-	"github.com/conformal/btcscript"
-	"github.com/conformal/btcutil"
+	"github.com/mably/btcscript"
+	"github.com/mably/btcutil"
 	"github.com/conformal/btcwallet/chain"
 	"github.com/conformal/btcwallet/keystore"
 	"github.com/conformal/btcwallet/txstore"
-	"github.com/conformal/btcwire"
-	"github.com/conformal/btcws"
+	"github.com/mably/btcwire"
+	"github.com/mably/btcws"
 	"github.com/conformal/websocket"
 )
 

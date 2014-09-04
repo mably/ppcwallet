@@ -24,12 +24,12 @@ import (
 	"sort"
 	"time"
 
-	"github.com/conformal/btcchain"
-	"github.com/conformal/btcscript"
-	"github.com/conformal/btcutil"
+	"github.com/mably/btcchain"
+	"github.com/mably/btcscript"
+	"github.com/mably/btcutil"
 	"github.com/conformal/btcwallet/keystore"
 	"github.com/conformal/btcwallet/txstore"
-	"github.com/conformal/btcwire"
+	"github.com/mably/btcwire"
 )
 
 // InsufficientFunds represents an error where there are not enough
