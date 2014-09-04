@@ -1,11 +1,11 @@
-btcwallet
+ppcwallet
 =========
 
-[![Build Status](https://travis-ci.org/conformal/btcwallet.png?branch=master)]
-(https://travis-ci.org/conformal/btcwallet)
+[![Build Status](https://travis-ci.org/mably/ppcwallet.png?branch=master)]
+(https://travis-ci.org/mably/ppcwallet)
 
-btcwallet is a daemon handling bitcoin wallet functionality for a
-single user.  It acts as both an RPC client to btcd and an RPC server
+ppcwallet is a daemon handling bitcoin wallet functionality for a
+single user.  It acts as both an RPC client to ppcd and an RPC server
 for wallet clients and legacy RPC applications.
 
 The wallet file format is based on
@@ -16,16 +16,16 @@ unsupported and are never written to disk.  This design decision has
 the consequence of generating new wallets on the fly impossible: a
 client is required to provide a wallet encryption passphrase.
 
-btcwallet is not an SPV client and requires connecting to a local or
-remote btcd instance for asynchronous blockchain queries and
-notifications over websockets.  Full btcd installation instructions
-can be found [here](https://github.com/conformal/btcd).
+ppcwallet is not an SPV client and requires connecting to a local or
+remote ppcd instance for asynchronous blockchain queries and
+notifications over websockets.  Full ppcd installation instructions
+can be found [here](https://github.com/mably/ppcd).
 
-As a daemon, btcwallet provides no user interface and an additional
+As a daemon, ppcwallet provides no user interface and an additional
 graphical or command line client is required for normal, personal
 wallet usage.  Conformal has written
-[btcgui](https://github.com/conformal/btcgui) as a graphical client
-to btcwallet.
+[btcgui](https://github.com/mably/btcgui) as a graphical client
+to ppcwallet.
 
 This project is currently under active development is not production
 ready yet.  Support for creating and using wallets the main Bitcoin
@@ -35,23 +35,23 @@ network is currently disabled by default.
 
 ### Windows - MSI Available
 
-Install the btcd suite MSI here:
+Install the ppcd suite MSI here:
 
-https://opensource.conformal.com/packages/windows/btcdsuite/
+https://opensource.conformal.com/packages/windows/ppcdsuite/
 
 ### Linux/BSD/POSIX - Build from Source
 
 - Install Go according to the installation instructions here:
   http://golang.org/doc/install
 
-- Run the following commands to obtain and install btcwallet and all
+- Run the following commands to obtain and install ppcwallet and all
   dependencies:
 ```bash
-$ go get -u -v github.com/conformal/btcd/...
-$ go get -u -v github.com/conformal/btcwallet/...
+$ go get -u -v github.com/mably/ppcd/...
+$ go get -u -v github.com/mably/ppcwallet/...
 ```
 
-- btcd and btcwallet will now be installed in either ```$GOROOT/bin``` or
+- ppcd and ppcwallet will now be installed in either ```$GOROOT/bin``` or
   ```$GOPATH/bin``` depending on your configuration.  If you did not already
   add to your system path during the installation, we recommend you do so now.
 
@@ -59,70 +59,70 @@ $ go get -u -v github.com/conformal/btcwallet/...
 
 ### Windows
 
-Install a newer btcd suite MSI here:
+Install a newer ppcd suite MSI here:
 
-https://opensource.conformal.com/packages/windows/btcdsuite/
+https://opensource.conformal.com/packages/windows/ppcdsuite/
 
 ### Linux/BSD/POSIX - Build from Source
 
-- Run the following commands to update btcwallet, all dependencies, and install it:
+- Run the following commands to update ppcwallet, all dependencies, and install it:
 
 ```bash
-$ go get -u -v github.com/conformal/btcd/...
-$ go get -u -v github.com/conformal/btcwallet/...
+$ go get -u -v github.com/mably/ppcd/...
+$ go get -u -v github.com/mably/ppcwallet/...
 ```
 
 ## Getting Started
 
-The follow instructions detail how to get started with btcwallet
-connecting to a localhost btcd.
+The follow instructions detail how to get started with ppcwallet
+connecting to a localhost ppcd.
 
 ### Windows (Installed from MSI)
 
 Open ```Btcd Suite``` from the ```Btcd Suite``` menu in the Start
 Menu.  This will also open btcgui, which can be closed if you only
-want btcd and btcwallet running.
+want ppcd and ppcwallet running.
 
 ### Linux/BSD/POSIX/Source
 
-- Run the following command to start btcd:
+- Run the following command to start ppcd:
 
 ```bash
-$ btcd --testnet -u rpcuser -P rpcpass
+$ ppcd --testnet -u rpcuser -P rpcpass
 ```
 
-- Run the following command to start btcwallet:
+- Run the following command to start ppcwallet:
 
 ```bash
-$ btcwallet -u rpcuser -P rpcpass
+$ ppcwallet -u rpcuser -P rpcpass
 ```
 
 If everything appears to be working, it is recommended at this point to
-copy the sample btcd and btcwallet configurations and update with your
+copy the sample ppcd and ppcwallet configurations and update with your
 RPC username and password.
 
 ```bash
-$ cp $GOPATH/src/github.com/conformal/btcd/sample-btcd.conf ~/.btcd/btcd.conf
-$ cp $GOPATH/src/github.com/conformal/btcwallet/sample-btcwallet.conf ~/.btcwallet/btcwallet.conf
-$ $EDITOR ~/.btcd/btcd.conf
-$ $EDITOR ~/.btcwallet/btcwallet.conf
+$ cp $GOPATH/src/github.com/mably/ppcd/sample-ppcd.conf ~/.ppcd/ppcd.conf
+$ cp $GOPATH/src/github.com/mably/ppcwallet/sample-ppcwallet.conf ~/.ppcwallet/ppcwallet.conf
+$ $EDITOR ~/.ppcd/ppcd.conf
+$ $EDITOR ~/.ppcwallet/ppcwallet.conf
 ```
 
 ## Client Usage
 
-Clients wishing to use btcwallet must connect to the `ws` endpoint
-over a websocket connection.  Messages sent to btcwallet over this
+Clients wishing to use ppcwallet must connect to the `ws` endpoint
+over a websocket connection.  Messages sent to ppcwallet over this
 websocket are expected to follow the standard Bitcoin JSON API
 (partially documented
 [here](https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_Calls_list)).
 Websocket connections also enable additional API extensions and
-JSON-RPC notifications (currently undocumented).  The btcd packages
+JSON-RPC notifications (currently undocumented).  The ppcd packages
 `btcjson` and `btcws` provide types and functions for creating and
 JSON (un)marshaling these requests and notifications.
 
 ## Issue Tracker
 
-The [integrated github issue tracker](https://github.com/conformal/btcwallet/issues)
+The [integrated github issue tracker](https://github.com/mably/ppcwallet/issues)
 is used for this project.
 
 ## GPG Verification Key
@@ -147,4 +147,4 @@ signature perform the following:
 
 ## License
 
-btcwallet is licensed under the liberal ISC License.
+ppcwallet is licensed under the liberal ISC License.
