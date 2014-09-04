@@ -24,8 +24,8 @@ import (
 	"github.com/mably/btcnet"
 	"github.com/conformal/btcrpcclient"
 	"github.com/mably/btcutil"
-	"github.com/conformal/btcwallet/keystore"
-	"github.com/conformal/btcwallet/txstore"
+	"github.com/mably/ppcwallet/keystore"
+	"github.com/mably/ppcwallet/txstore"
 	"github.com/mably/btcwire"
 	"github.com/mably/btcws"
 )

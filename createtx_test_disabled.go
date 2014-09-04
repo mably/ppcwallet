@@ -14,8 +14,8 @@ import (
 
 	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
-	"github.com/conformal/btcwallet/tx"
-	"github.com/conformal/btcwallet/wallet"
+	"github.com/mably/ppcwallet/tx"
+	"github.com/mably/ppcwallet/wallet"
 	"github.com/mably/btcwire"
 )
 

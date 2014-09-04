@@ -41,7 +41,7 @@ import (
 	"github.com/mably/btcnet"
 	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
-	"github.com/conformal/btcwallet/rename"
+	"github.com/mably/ppcwallet/rename"
 	"github.com/mably/btcwire"
 )
 

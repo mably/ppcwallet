@@ -18,8 +18,8 @@ package main
 
 import (
 	"github.com/mably/btcutil"
-	"github.com/conformal/btcwallet/chain"
-	"github.com/conformal/btcwallet/keystore"
+	"github.com/mably/ppcwallet/chain"
+	"github.com/mably/ppcwallet/keystore"
 	"github.com/mably/btcwire"
 )
 

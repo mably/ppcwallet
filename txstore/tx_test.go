@@ -22,7 +22,7 @@ import (
 
 	"github.com/mably/btcnet"
 	"github.com/mably/btcutil"
-	. "github.com/conformal/btcwallet/txstore"
+	. "github.com/mably/ppcwallet/txstore"
 	"github.com/mably/btcwire"
 )
 

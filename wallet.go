@@ -30,9 +30,9 @@ import (
 	"github.com/conformal/btcjson"
 	"github.com/mably/btcnet"
 	"github.com/mably/btcutil"
-	"github.com/conformal/btcwallet/chain"
-	"github.com/conformal/btcwallet/keystore"
-	"github.com/conformal/btcwallet/txstore"
+	"github.com/mably/ppcwallet/chain"
+	"github.com/mably/ppcwallet/keystore"
+	"github.com/mably/ppcwallet/txstore"
 	"github.com/mably/btcwire"
 )
 
