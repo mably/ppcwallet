@@ -24,8 +24,8 @@ can be found [here](https://github.com/mably/ppcd).
 As a daemon, ppcwallet provides no user interface and an additional
 graphical or command line client is required for normal, personal
 wallet usage.  Conformal has written
-[btcgui](https://github.com/mably/btcgui) as a graphical client
-to ppcwallet.
+[btcgui](https://github.com/conformal/btcgui) as a graphical client
+to btcwallet. It has not been ported to ppcwallet yet.
 
 This project is currently under active development is not production
 ready yet.  Support for creating and using wallets the main Bitcoin
@@ -102,8 +102,8 @@ copy the sample ppcd and ppcwallet configurations and update with your
 RPC username and password.
 
 ```bash
-$ cp $GOPATH/src/github.com/mably/ppcd/sample-ppcd.conf ~/.ppcd/ppcd.conf
-$ cp $GOPATH/src/github.com/mably/ppcwallet/sample-ppcwallet.conf ~/.ppcwallet/ppcwallet.conf
+$ cp $GOPATH/src/github.com/mably/ppcd/sample-btcd.conf ~/.ppcd/ppcd.conf
+$ cp $GOPATH/src/github.com/mably/ppcwallet/sample-btcwallet.conf ~/.ppcwallet/ppcwallet.conf
 $ $EDITOR ~/.ppcd/ppcd.conf
 $ $EDITOR ~/.ppcwallet/ppcwallet.conf
 ```
