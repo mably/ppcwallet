@@ -126,7 +126,7 @@ JSON (un)marshaling these requests and notifications.
 The [integrated github issue tracker](https://github.com/mably/ppcwallet/issues)
 is used for this project.
 
-## GPG Verification Key
+<!--## GPG Verification Key
 
 All official release tags are signed by Conformal so users can ensure the code
 has not been tampered with and is coming from Conformal.  To verify the
@@ -145,7 +145,7 @@ signature perform the following:
   ```bash
   git tag -v TAG_NAME
   ```
-
+-->
 ## License
 
 ppcwallet is licensed under the liberal ISC License.
