@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/mably/btcnet"
-	"github.com/conformal/btcrpcclient"
+	"github.com/mably/btcrpcclient"
 	"github.com/mably/btcutil"
 	"github.com/mably/ppcwallet/keystore"
 	"github.com/mably/ppcwallet/txstore"

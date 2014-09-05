@@ -40,7 +40,7 @@ import (
 
 	"github.com/conformal/btcec"
 	"github.com/conformal/btcjson"
-	"github.com/conformal/btcrpcclient"
+	"github.com/mably/btcrpcclient"
 	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
 	"github.com/mably/ppcwallet/chain"
