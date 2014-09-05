@@ -7,7 +7,8 @@ ppcwallet
 
 ppcwallet is a daemon handling bitcoin wallet functionality for a
 single user.  It acts as both an RPC client to ppcd and an RPC server
-for wallet clients and legacy RPC applications.
+for wallet clients and legacy RPC applications.  It is based on the
+Conformal [btcwallet](https://github.com/conformal/btcwallet) code.
 
 The wallet file format is based on
 [Armory](https://github.com/etotheipi/BitcoinArmory) and provides a
