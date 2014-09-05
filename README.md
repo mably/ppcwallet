@@ -34,13 +34,7 @@ network is currently disabled by default.
 
 ## Installation
 
-### Windows - MSI Available
-
-Install the ppcd suite MSI here:
-
-https://opensource.conformal.com/packages/windows/ppcdsuite/
-
-### Linux/BSD/POSIX - Build from Source
+### Build from Source
 
 - Install Go according to the installation instructions here:
   http://golang.org/doc/install
@@ -58,13 +52,7 @@ $ go get -u -v github.com/mably/ppcwallet/...
 
 ## Updating
 
-### Windows
-
-Install a newer ppcd suite MSI here:
-
-https://opensource.conformal.com/packages/windows/ppcdsuite/
-
-### Linux/BSD/POSIX - Build from Source
+### Build from Source
 
 - Run the following commands to update ppcwallet, all dependencies, and install it:
 
@@ -78,11 +66,7 @@ $ go get -u -v github.com/mably/ppcwallet/...
 The follow instructions detail how to get started with ppcwallet
 connecting to a localhost ppcd.
 
-### Windows (Installed from MSI)
-
-Open ```Btcd Suite``` from the ```Btcd Suite``` menu in the Start
-Menu.  This will also open btcgui, which can be closed if you only
-want ppcd and ppcwallet running.
+### Windows
 
 ### Linux/BSD/POSIX/Source
 
