@@ -32,7 +32,7 @@ import (
 const (
 	defaultCAFilename       = "ppcd.cert"
 	defaultConfigFilename   = "ppcwallet.conf"
-	defaultBtcNet           = btcwire.TestNet3
+	defaultBtcNet           = btcwire.MainNet
 	defaultLogLevel         = "info"
 	defaultLogDirname       = "logs"
 	defaultLogFilename      = "ppcwallet.log"

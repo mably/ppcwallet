@@ -35,8 +35,8 @@ type params struct {
 // btcd on the main network (btcwire.MainNet).
 var mainNetParams = params{
 	Params:   &btcnet.MainNetParams,
-	connect:  "localhost:8334",
-	btcdPort: "8334",
+	connect:  "localhost:9902",
+	btcdPort: "9902",
 	svrPort:  "8332",
 }
 
