@@ -24,7 +24,6 @@ import (
 	"sort"
 	"time"
 
-	"github.com/mably/btcchain"
 	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
 	"github.com/mably/ppcwallet/keystore"
@@ -289,7 +288,7 @@ func (w *Wallet) findEligibleOuptuts(minconf int, bs *keystore.BlockStamp) ([]tx
 			// Coinbase transactions must have have reached maturity
 			// before their outputs may be spent.
 			if unspent[i].IsCoinbase() {
-				target := btcchain.CoinbaseMaturity
+				target := int(activeNet.Params.CoinbaseMaturity)
 				if !unspent[i].Confirmed(target, bs.Height) {
 					continue
 				}

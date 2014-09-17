@@ -167,13 +167,13 @@ func (w *Wallet) notifyBalances(curHeight int32) {
 	}
 
 	// Notify any potential changes to the balance.
-	confirmed, err := w.TxStore.Balance(1, curHeight)
+	confirmed, err := w.TxStore.Balance(1, curHeight, activeNet.Params)
 	if err != nil {
 		log.Errorf("Cannot determine 1-conf balance: %v", err)
 		return
 	}
 	w.notifyConfirmedBalance(confirmed)
-	unconfirmed, err := w.TxStore.Balance(0, curHeight)
+	unconfirmed, err := w.TxStore.Balance(0, curHeight, activeNet.Params)
 	if err != nil {
 		log.Errorf("Cannot determine 0-conf balance: %v", err)
 		return

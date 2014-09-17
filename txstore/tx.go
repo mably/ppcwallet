@@ -24,7 +24,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mably/btcchain"
 	"github.com/mably/btcnet"
 	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
@@ -1219,14 +1218,16 @@ func confirms(txHeight, curHeight int32) int32 {
 // transaction outputs) given a minimum of minConf confirmations, calculated
 // at a current chain height of curHeight.  Coinbase outputs are only included
 // in the balance if maturity has been reached.
-func (s *Store) Balance(minConf int, chainHeight int32) (btcutil.Amount, error) {
+func (s *Store) Balance(minConf int, chainHeight int32,
+	net *btcnet.Params) (btcutil.Amount, error) {
 	s.mtx.RLock()
 	defer s.mtx.RUnlock()
 
-	return s.balance(minConf, chainHeight)
+	return s.balance(minConf, chainHeight, net)
 }
 
-func (s *Store) balance(minConf int, chainHeight int32) (btcutil.Amount, error) {
+func (s *Store) balance(minConf int, chainHeight int32,
+	net *btcnet.Params) (btcutil.Amount, error) {
 	var bal btcutil.Amount
 
 	// Shadow these functions to avoid repeating arguments unnecesarily.
@@ -1240,7 +1241,7 @@ func (s *Store) balance(minConf int, chainHeight int32) (btcutil.Amount, error) 
 	for _, b := range s.blocks {
 		if confirmed(b.Height) {
 			bal += b.amountDeltas.Spendable
-			if confirms(b.Height) >= btcchain.CoinbaseMaturity {
+			if confirms(b.Height) >= int32(net.CoinbaseMaturity) {
 				bal += b.amountDeltas.Reward
 			}
 			continue

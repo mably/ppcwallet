@@ -17,7 +17,6 @@
 package txstore
 
 import (
-	"github.com/mably/btcchain"
 	"github.com/conformal/btcjson"
 	"github.com/mably/btcnet"
 	"github.com/mably/btcscript"
@@ -116,16 +115,18 @@ const (
 
 // category returns the category of the credit.  The passed block chain height is
 // used to distinguish immature from mature coinbase outputs.
-func (c *Credit) Category(chainHeight int32) CreditCategory {
+func (c *Credit) Category(chainHeight int32,
+	net *btcnet.Params) CreditCategory {
 	c.s.mtx.RLock()
 	defer c.s.mtx.RUnlock()
 
-	return c.category(chainHeight)
+	return c.category(chainHeight, net)
 }
 
-func (c *Credit) category(chainHeight int32) CreditCategory {
+func (c *Credit) category(chainHeight int32,
+	net *btcnet.Params) CreditCategory {
 	if c.isCoinbase() {
-		if confirmed(btcchain.CoinbaseMaturity, c.BlockHeight, chainHeight) {
+		if confirmed(int(net.CoinbaseMaturity), c.BlockHeight, chainHeight) {
 			return CreditGenerate
 		}
 		return CreditImmature
@@ -174,7 +175,7 @@ func (c Credit) toJSON(account string, chainHeight int32,
 
 	result := btcjson.ListTransactionsResult{
 		Account:         account,
-		Category:        c.category(chainHeight).String(),
+		Category:        c.category(chainHeight, net).String(),
 		Address:         address,
 		Amount:          btcutil.Amount(txout.Value).ToUnit(btcutil.AmountBTC),
 		TxID:            c.Tx().Sha().String(),

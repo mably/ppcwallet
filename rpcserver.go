@@ -1977,7 +1977,7 @@ func GetTransaction(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interf
 
 		ret.Details = append(ret.Details, btcjson.GetTransactionDetailsResult{
 			Account:  "",
-			Category: cred.Category(bs.Height).String(),
+			Category: cred.Category(bs.Height, activeNet.Params).String(),
 			Amount:   cred.Amount().ToUnit(btcutil.AmountBTC),
 			Address:  addr,
 		})

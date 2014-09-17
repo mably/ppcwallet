@@ -26,7 +26,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mably/btcchain"
 	"github.com/conformal/btcjson"
 	"github.com/mably/btcnet"
 	"github.com/mably/btcutil"
@@ -766,7 +765,7 @@ func (w *Wallet) CalculateBalance(confirms int) (btcutil.Amount, error) {
 		return 0, err
 	}
 
-	return w.TxStore.Balance(confirms, bs.Height)
+	return w.TxStore.Balance(confirms, bs.Height, activeNet.Params)
 }
 
 // CurrentAddress gets the most recently requested Bitcoin payment address
@@ -941,7 +940,8 @@ func (w *Wallet) ListUnspent(minconf, maxconf int,
 			continue
 		}
 		if credit.IsCoinbase() {
-			if !credit.Confirmed(btcchain.CoinbaseMaturity, bs.Height) {
+			if !credit.Confirmed(
+				int(activeNet.Params.CoinbaseMaturity), bs.Height) {
 				continue
 			}
 		}
