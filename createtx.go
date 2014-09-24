@@ -63,7 +63,8 @@ var ErrNegativeFee = errors.New("fee is negative")
 
 // defaultFeeIncrement is the default minimum transation fee (0.0001 BTC,
 // measured in satoshis) added to transactions requiring a fee.
-const defaultFeeIncrement = 10000
+//const defaultFeeIncrement = 10000
+const defaultFeeIncrement = 1000000 // ppc: peercoin min fee is 0.01 PPC
 
 type CreatedTx struct {
 	tx          *btcutil.Tx
