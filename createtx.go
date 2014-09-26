@@ -63,8 +63,7 @@ var ErrNegativeFee = errors.New("fee is negative")
 
 // defaultFeeIncrement is the default minimum transation fee (0.0001 BTC,
 // measured in satoshis) added to transactions requiring a fee.
-//const defaultFeeIncrement = 10000
-const defaultFeeIncrement = 1000000 // ppc: peercoin min fee is 0.01 PPC
+const defaultFeeIncrement = 10000 // ppc: peercoin min fee and fee increment is 0.01 PPC
 
 type CreatedTx struct {
 	tx          *btcutil.Tx
@@ -172,7 +171,7 @@ func (w *Wallet) txToPairs(pairs map[string]btcutil.Amount,
 
 	// Get the number of satoshis to increment fee by when searching for
 	// the minimum tx fee needed.
-	fee := btcutil.Amount(0)
+	fee := btcutil.Amount(w.FeeIncrement) // ppc: minimum fee is 0.01 PPC
 	for {
 		msgtx = txNoInputs.Copy()
 		changeIdx = -1
@@ -222,9 +221,9 @@ func (w *Wallet) txToPairs(pairs map[string]btcutil.Amount,
 		}
 
 		noFeeAllowed := false
-		if !cfg.DisallowFree {
+		/*if !cfg.DisallowFree { // ppc: peercoin has no free tx
 			noFeeAllowed = allowFree(bs.Height, inputs, msgtx.SerializeSize())
-		}
+		}*/
 		if minFee := minimumFee(w.FeeIncrement, msgtx, noFeeAllowed); fee < minFee {
 			fee = minFee
 		} else {
