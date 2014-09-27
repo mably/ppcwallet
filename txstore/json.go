@@ -17,7 +17,7 @@
 package txstore
 
 import (
-	"github.com/conformal/btcjson"
+	"github.com/mably/btcjson"
 	"github.com/mably/btcnet"
 	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"

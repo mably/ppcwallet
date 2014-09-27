@@ -39,7 +39,7 @@ import (
 	"time"
 
 	"github.com/conformal/btcec"
-	"github.com/conformal/btcjson"
+	"github.com/mably/btcjson"
 	"github.com/mably/btcrpcclient"
 	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
