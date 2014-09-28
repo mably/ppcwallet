@@ -1715,7 +1715,7 @@ func GetInfo(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interface{}, 
 	}
 
 	info.WalletVersion = int32(keystore.VersCurrent.Uint32())
-	info.Balance = bal.ToUnit(btcutil.AmountBTC)
+	info.Balance = btcjson.FloatAmount(bal.ToUnit(btcutil.AmountBTC))
 	// Keypool times are not tracked. set to current time.
 	info.KeypoolOldest = time.Now().Unix()
 	info.KeypoolSize = int32(cfg.KeypoolSize)
