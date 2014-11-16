@@ -18,7 +18,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/ecdsa"
 	"crypto/sha256"
 	"crypto/subtle"
 	"crypto/tls"
@@ -1343,11 +1342,13 @@ var rpcHandlers = map[string]requestHandler{
 	"getnewaddress":          GetNewAddress,
 	"getrawchangeaddress":    GetRawChangeAddress,
 	"getreceivedbyaccount":   GetReceivedByAccount,
+	"getreceivedbyaddress":   GetReceivedByAddress,
 	"gettransaction":         GetTransaction,
 	"importprivkey":          ImportPrivKey,
 	"keypoolrefill":          KeypoolRefill,
 	"listaccounts":           ListAccounts,
 	"listlockunspent":        ListLockUnspent,
+	"listreceivedbyaccount":  ListReceivedByAccount,
 	"listreceivedbyaddress":  ListReceivedByAddress,
 	"listsinceblock":         ListSinceBlock,
 	"listtransactions":       ListTransactions,
@@ -1366,19 +1367,17 @@ var rpcHandlers = map[string]requestHandler{
 	"walletpassphrasechange": WalletPassphraseChange,
 
 	// Reference implementation methods (still unimplemented)
-	"backupwallet":          Unimplemented,
-	"dumpwallet":            Unimplemented,
-	"getreceivedbyaddress":  Unimplemented,
-	"getwalletinfo":         Unimplemented,
-	"importwallet":          Unimplemented,
-	"listaddressgroupings":  Unimplemented,
-	"listreceivedbyaccount": Unimplemented,
-	"move":                  Unimplemented,
-	"setaccount":            Unimplemented,
+	"backupwallet":         Unimplemented,
+	"dumpwallet":           Unimplemented,
+	"getwalletinfo":        Unimplemented,
+	"importwallet":         Unimplemented,
+	"listaddressgroupings": Unimplemented,
 
 	// Reference methods which can't be implemented by btcwallet due to
 	// design decision differences
 	"encryptwallet": Unsupported,
+	"move":          Unsupported,
+	"setaccount":    Unsupported,
 
 	// Extensions to the reference client JSON-RPC API
 	"exportwatchingwallet": ExportWatchingWallet,
@@ -1881,6 +1880,23 @@ func GetReceivedByAccount(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (
 	return bal.ToUnit(btcutil.AmountBTC), nil
 }
 
+// GetReceivedByAddress handles a getreceivedbyaddress request by returning
+// the total amount received by a single address.
+func GetReceivedByAddress(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interface{}, error) {
+	cmd := icmd.(*btcjson.GetReceivedByAddressCmd)
+
+	addr, err := btcutil.DecodeAddress(cmd.Address, activeNet.Params)
+	if err != nil {
+		return nil, InvalidAddressOrKeyError{err}
+	}
+	total, err := w.TotalReceivedForAddr(addr, cmd.MinConf)
+	if err != nil {
+		return nil, err
+	}
+
+	return total.ToUnit(btcutil.AmountBTC), nil
+}
+
 // GetTransaction handles a gettransaction request by returning details about
 // a single transaction saved by wallet.
 func GetTransaction(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interface{}, error) {
@@ -2007,6 +2023,53 @@ func ListLockUnspent(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (inter
 	return w.LockedOutpoints(), nil
 }
 
+// ListReceivedByAccount handles a listreceivedbyaccount request by returning
+// a slice of objects, each one containing:
+//  "account": the receiving account;
+//  "amount": total amount received by the account;
+//  "confirmations": number of confirmations of the most recent transaction.
+// It takes two parameters:
+//  "minconf": minimum number of confirmations to consider a transaction -
+//             default: one;
+//  "includeempty": whether or not to include addresses that have no transactions -
+//                  default: false.
+// Since btcwallet doesn't implement account support yet, only the default account ""
+// will be returned
+func ListReceivedByAccount(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interface{}, error) {
+	cmd := icmd.(*btcjson.ListReceivedByAccountCmd)
+
+	bs, err := w.SyncedChainTip()
+	if err != nil {
+		return nil, err
+	}
+
+	// Total amount received.
+	var amount btcutil.Amount
+
+	// Number of confirmations of the last transaction.
+	var confirmations int32
+
+	for _, record := range w.TxStore.Records() {
+		for _, credit := range record.Credits() {
+			if !credit.Confirmed(cmd.MinConf, bs.Height) {
+				// Not enough confirmations, skip the current block.
+				continue
+			}
+			amount += credit.Amount()
+			confirmations = credit.Confirmations(bs.Height)
+		}
+	}
+
+	ret := []btcjson.ListReceivedByAccountResult{
+		{
+			Account:       "",
+			Amount:        amount.ToUnit(btcutil.AmountBTC),
+			Confirmations: uint64(confirmations),
+		},
+	}
+	return ret, nil
+}
+
 // ListReceivedByAddress handles a listreceivedbyaddress request by returning
 // a slice of objects, each one containing:
 //  "account": the account of the receiving address;
@@ -2027,6 +2090,8 @@ func ListReceivedByAddress(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) 
 		amount btcutil.Amount
 		// Number of confirmations of the last transaction.
 		confirmations int32
+		// Hashes of transactions which include an output paying to the address
+		tx []string
 	}
 
 	bs, err := w.SyncedChainTip()
@@ -2069,6 +2134,7 @@ func ListReceivedByAddress(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) 
 						confirmations: confirmations,
 					}
 				}
+				addrData.tx = append(addrData.tx, credit.Tx().Sha().String())
 				allAddrData[addrStr] = addrData
 			}
 		}
@@ -2084,6 +2150,7 @@ func ListReceivedByAddress(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) 
 			Address:       address,
 			Amount:        addrData.amount.ToUnit(btcutil.AmountBTC),
 			Confirmations: uint64(addrData.confirmations),
+			TxIDs:         addrData.tx,
 		}
 		idx++
 	}
@@ -2401,13 +2468,14 @@ func SignMessage(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interface
 	}
 
 	pka := ainfo.(keystore.PubKeyAddress)
-	privkey, err := pka.PrivKey()
+	tmp, err := pka.PrivKey()
 	if err != nil {
 		return nil, err
 	}
+	privKey := (*btcec.PrivateKey)(tmp)
 
 	fullmsg := "Bitcoin Signed Message:\n" + cmd.Message
-	sigbytes, err := btcec.SignCompact(btcec.S256(), privkey,
+	sigbytes, err := btcec.SignCompact(btcec.S256(), privKey,
 		btcwire.DoubleSha256([]byte(fullmsg)), ainfo.Compressed())
 	if err != nil {
 		return nil, err
@@ -2551,7 +2619,7 @@ func SignRawTransaction(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (in
 	requested := make(map[btcwire.ShaHash]*pendingTx)
 	for _, txIn := range msgTx.TxIn {
 		// Did we get this txin from the arguments?
-		if _, ok := inputs[txIn.PreviousOutpoint]; ok {
+		if _, ok := inputs[txIn.PreviousOutPoint]; ok {
 			continue
 		}
 
@@ -2560,17 +2628,17 @@ func SignRawTransaction(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (in
 		// reference each outpoint once, since anything else is a double
 		// spend. We don't check this ourselves to save having to scan
 		// the array, it will fail later if so).
-		if ptx, ok := requested[txIn.PreviousOutpoint.Hash]; ok {
+		if ptx, ok := requested[txIn.PreviousOutPoint.Hash]; ok {
 			ptx.inputs = append(ptx.inputs,
-				txIn.PreviousOutpoint.Index)
+				txIn.PreviousOutPoint.Index)
 			continue
 		}
 
 		// Never heard of this one before, request it.
-		prevHash := &txIn.PreviousOutpoint.Hash
-		requested[txIn.PreviousOutpoint.Hash] = &pendingTx{
+		prevHash := &txIn.PreviousOutPoint.Hash
+		requested[txIn.PreviousOutPoint.Hash] = &pendingTx{
 			resp:   chainSvr.GetRawTransactionAsync(prevHash),
-			inputs: []uint32{txIn.PreviousOutpoint.Index},
+			inputs: []uint32{txIn.PreviousOutPoint.Index},
 		}
 	}
 
@@ -2655,26 +2723,26 @@ func SignRawTransaction(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (in
 	// reply.
 	complete := true
 	for i, txIn := range msgTx.TxIn {
-		input, ok := inputs[txIn.PreviousOutpoint]
+		input, ok := inputs[txIn.PreviousOutPoint]
 		if !ok {
 			// failure to find previous is actually an error since
 			// we failed above if we don't have all the inputs.
 			return nil, fmt.Errorf("%s:%d not found",
-				txIn.PreviousOutpoint.Hash,
-				txIn.PreviousOutpoint.Index)
+				txIn.PreviousOutPoint.Hash,
+				txIn.PreviousOutPoint.Index)
 		}
 
 		// Set up our callbacks that we pass to btcscript so it can
 		// look up the appropriate keys and scripts by address.
 		getKey := btcscript.KeyClosure(func(addr btcutil.Address) (
-			*ecdsa.PrivateKey, bool, error) {
+			*btcec.PrivateKey, bool, error) {
 			if len(keys) != 0 {
 				wif, ok := keys[addr.EncodeAddress()]
 				if !ok {
 					return nil, false,
 						errors.New("no key for address")
 				}
-				return wif.PrivKey.ToECDSA(), wif.CompressPubKey, nil
+				return wif.PrivKey, wif.CompressPubKey, nil
 			}
 			address, err := w.KeyStore.Address(addr)
 			if err != nil {
@@ -2730,7 +2798,7 @@ func SignRawTransaction(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (in
 			btcscript.SigHashSingle || i < len(msgTx.TxOut) {
 
 			script, err := btcscript.SignTxOutput(activeNet.Params,
-				msgTx, i, input, byte(hashType), getKey,
+				msgTx, i, input, hashType, getKey,
 				getScript, txIn.SignatureScript)
 			// Failure to sign isn't an error, it just means that
 			// the tx isn't complete.
@@ -2826,25 +2894,6 @@ func VerifyMessage(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interfa
 		return nil, ParseError{err}
 	}
 
-	switch addr.(type) {
-	case *btcutil.AddressPubKeyHash: // ok
-	case *btcutil.AddressPubKey: // ok
-	default:
-		return nil, errors.New("address type not supported")
-	}
-
-	// First check we know about the address and get the keys.
-	ainfo, err := w.KeyStore.Address(addr)
-	if err != nil {
-		return nil, btcjson.ErrInvalidAddressOrKey
-	}
-
-	pka := ainfo.(keystore.PubKeyAddress)
-	privkey, err := pka.PrivKey()
-	if err != nil {
-		return nil, err
-	}
-
 	// decode base64 signature
 	sig, err := base64.StdEncoding.DecodeString(cmd.Signature)
 	if err != nil {
@@ -2860,9 +2909,21 @@ func VerifyMessage(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interfa
 		return nil, err
 	}
 
-	// Return boolean if keys match.
-	return (pk.X.Cmp(privkey.X) == 0 && pk.Y.Cmp(privkey.Y) == 0 &&
-		ainfo.Compressed() == wasCompressed), nil
+	var serializedPubKey []byte
+	if wasCompressed {
+		serializedPubKey = pk.SerializeCompressed()
+	} else {
+		serializedPubKey = pk.SerializeUncompressed()
+	}
+	// Verify that the signed-by address matches the given address
+	switch checkAddr := addr.(type) {
+	case *btcutil.AddressPubKeyHash: // ok
+		return bytes.Equal(btcutil.Hash160(serializedPubKey), checkAddr.Hash160()[:]), nil
+	case *btcutil.AddressPubKey: // ok
+		return string(serializedPubKey) == checkAddr.String(), nil
+	default:
+		return nil, errors.New("address type not supported")
+	}
 }
 
 // WalletIsLocked handles the walletislocked extension request by
