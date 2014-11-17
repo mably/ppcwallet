@@ -17,9 +17,9 @@
 package votingpool
 
 import (
-	"github.com/conformal/btcutil/hdkeychain"
-	"github.com/conformal/btcwallet/waddrmgr"
-	"github.com/conformal/btcwallet/walletdb"
+	"github.com/mably/btcutil/hdkeychain"
+	"github.com/mably/ppcwallet/waddrmgr"
+	"github.com/mably/ppcwallet/walletdb"
 )
 
 // TstPutSeries transparently wraps the voting pool putSeries method.

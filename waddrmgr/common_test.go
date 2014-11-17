@@ -23,10 +23,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/conformal/btcnet"
-	"github.com/conformal/btcwallet/waddrmgr"
-	"github.com/conformal/btcwallet/walletdb"
-	_ "github.com/conformal/btcwallet/walletdb/bdb"
+	"github.com/mably/btcnet"
+	"github.com/mably/ppcwallet/waddrmgr"
+	"github.com/mably/ppcwallet/walletdb"
+	_ "github.com/mably/ppcwallet/walletdb/bdb"
 )
 
 var (

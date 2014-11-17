@@ -23,8 +23,8 @@ import (
 	"sync"
 
 	"github.com/conformal/btcec"
-	"github.com/conformal/btcutil"
-	"github.com/conformal/btcutil/hdkeychain"
+	"github.com/mably/btcutil"
+	"github.com/mably/btcutil/hdkeychain"
 )
 
 // zero sets all bytes in the passed slice to zero.  This is used to

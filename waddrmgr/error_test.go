@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/conformal/btcwallet/waddrmgr"
+	"github.com/mably/ppcwallet/waddrmgr"
 )
 
 // TestErrorCodeStringer tests the stringized output for the ErrorCode type.

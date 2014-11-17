@@ -22,8 +22,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/conformal/btcwallet/walletdb"
-	"github.com/conformal/btcwire"
+	"github.com/mably/ppcwallet/walletdb"
+	"github.com/mably/btcwire"
 	"github.com/conformal/fastsha256"
 )
 

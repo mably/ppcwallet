@@ -19,8 +19,8 @@ package waddrmgr
 import (
 	"sync"
 
-	"github.com/conformal/btcwallet/walletdb"
-	"github.com/conformal/btcwire"
+	"github.com/mably/ppcwallet/walletdb"
+	"github.com/mably/btcwire"
 )
 
 const (

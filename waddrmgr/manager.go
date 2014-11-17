@@ -21,12 +21,12 @@ import (
 	"sync"
 
 	"github.com/conformal/btcec"
-	"github.com/conformal/btcnet"
-	"github.com/conformal/btcutil"
-	"github.com/conformal/btcutil/hdkeychain"
-	"github.com/conformal/btcwallet/snacl"
-	"github.com/conformal/btcwallet/walletdb"
-	"github.com/conformal/btcwire"
+	"github.com/mably/btcnet"
+	"github.com/mably/btcutil"
+	"github.com/mably/btcutil/hdkeychain"
+	"github.com/mably/ppcwallet/snacl"
+	"github.com/mably/ppcwallet/walletdb"
+	"github.com/mably/btcwire"
 )
 
 const (

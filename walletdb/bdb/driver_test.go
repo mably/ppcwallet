@@ -22,8 +22,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/conformal/btcwallet/walletdb"
-	_ "github.com/conformal/btcwallet/walletdb/bdb"
+	"github.com/mably/ppcwallet/walletdb"
+	_ "github.com/mably/ppcwallet/walletdb/bdb"
 )
 
 // dbType is the database type name for this driver.

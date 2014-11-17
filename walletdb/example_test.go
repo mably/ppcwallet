@@ -22,8 +22,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/conformal/btcwallet/walletdb"
-	_ "github.com/conformal/btcwallet/walletdb/bdb"
+	"github.com/mably/ppcwallet/walletdb"
+	_ "github.com/mably/ppcwallet/walletdb/bdb"
 )
 
 // This example demonstrates creating a new database.

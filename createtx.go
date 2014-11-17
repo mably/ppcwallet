@@ -192,18 +192,12 @@ func createTx(
 	szEst := estimateTxSize(len(inputs), len(msgtx.TxOut))
 	feeEst := minimumFee(feeIncrement, szEst, msgtx.TxOut, inputs, bs.Height)
 
-	// Get the number of satoshis to increment fee by when searching for
-	// the minimum tx fee needed.
-	fee := btcutil.Amount(w.FeeIncrement) // ppc: minimum fee is 0.01 PPC
-	for {
-		msgtx = txNoInputs.Copy()
-		changeIdx = -1
-
-		// Select eligible outputs to be used in transaction based on the amount
-		// needed to be sent, and the current fee estimation.
-		inputs, btcin, err := selectInputs(eligible, amt, fee, minconf)
-		if err != nil {
-			return nil, err
+	// Now make sure the sum amount of all our inputs is enough for the
+	// sum amount of all outputs plus the fee. If necessary we add more,
+	// inputs, but in that case we also need to recalculate the fee.
+	for totalAdded < minAmount+feeEst {
+		if len(eligible) == 0 {
+			return nil, InsufficientFundsError{totalAdded, minAmount, feeEst}
 		}
 		input, eligible = eligible[0], eligible[1:]
 		inputs = append(inputs, input)
@@ -237,14 +231,9 @@ func createTx(
 			return nil, err
 		}
 
-		noFeeAllowed := false
-		/*if !cfg.DisallowFree { // ppc: peercoin has no free tx
-			noFeeAllowed = allowFree(bs.Height, inputs, msgtx.SerializeSize())
-		}*/
-		if minFee := minimumFee(w.FeeIncrement, msgtx, noFeeAllowed); fee < minFee {
-			fee = minFee
-		} else {
-			selectedInputs = inputs
+		if feeForSize(feeIncrement, msgtx.SerializeSize()) <= feeEst {
+			// The required fee for this size is less than or equal to what
+			// we guessed, so we're done.
 			break
 		}
 
@@ -446,9 +435,9 @@ func validateMsgTx(msgtx *btcwire.MsgTx, prevOutputs []txstore.Credit) error {
 // incr, incrementing the fee for each kilobyte of transaction.
 func minimumFee(incr btcutil.Amount, txLen int, outputs []*btcwire.TxOut, prevOutputs []txstore.Credit, height int32) btcutil.Amount {
 	allowFree := false
-	if !cfg.DisallowFree {
+	/*if !cfg.DisallowFree { // ppc: peercoin has no free tx
 		allowFree = allowNoFeeTx(height, prevOutputs, txLen)
-	}
+	}*/
 	fee := feeForSize(incr, txLen)
 
 	if allowFree && txLen < 1000 {

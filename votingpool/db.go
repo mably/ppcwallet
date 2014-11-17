@@ -21,9 +21,9 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"github.com/conformal/btcwallet/snacl"
-	"github.com/conformal/btcwallet/waddrmgr"
-	"github.com/conformal/btcwallet/walletdb"
+	"github.com/mably/ppcwallet/snacl"
+	"github.com/mably/ppcwallet/waddrmgr"
+	"github.com/mably/ppcwallet/walletdb"
 )
 
 // These constants define the serialized length for a given encrypted extended
