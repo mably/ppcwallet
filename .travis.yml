@@ -3,7 +3,6 @@ go:
   - 1.2
   - release
   - tip
-install: go get -d -t -v ./...
 install:
   - go get -d -t -v ./...
   - ./.travis/get_ci_vet.sh
