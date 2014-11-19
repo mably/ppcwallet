@@ -9,7 +9,7 @@ import (
 	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
 	"github.com/mably/ppcwallet/keystore"
-	"github.com/mably/ppccwallet/txstore"
+	"github.com/mably/ppcwallet/txstore"
 	"github.com/mably/btcwire"
 )
 
