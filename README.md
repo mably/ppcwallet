@@ -1,7 +1,7 @@
 ppcwallet
 =========
 
-[![Build Status](https://travis-ci.org/mably/ppcwallet.png?branch=master)]
+[![Build Status](https://travis-ci.org/mably/ppcwallet.png?branch=mably)]
 (https://travis-ci.org/mably/ppcwallet)
 [![tip for next commit](http://peer4commit.com/projects/130.svg)](http://peer4commit.com/projects/130)
 
