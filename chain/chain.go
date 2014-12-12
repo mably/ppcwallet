@@ -187,6 +187,7 @@ func parseBlock(block *btcws.BlockDetails) (blk *txstore.Block, idx int, offset 
 		Height: block.Height,
 		Hash:   *blksha,
 		Time:   time.Unix(block.Time, 0),
+		StakeModifier: block.StakeModifier, // ppc:
 	}
 	return blk, block.Index, block.Offset, nil
 }
@@ -207,7 +208,7 @@ func (c *Client) onBlockDisconnected(hash *btcwire.ShaHash, height int32) {
 func (c *Client) onRecvTx(tx *btcutil.Tx, block *btcws.BlockDetails) {
 	var blk *txstore.Block
 	index := btcutil.TxIndexUnknown
-	offset := btcutil.TxOffsetUnknown
+	offset := btcutil.TxOffsetUnknown // ppc:
 	if block != nil {
 		var err error
 		blk, index, offset, err = parseBlock(block)
@@ -218,14 +219,14 @@ func (c *Client) onRecvTx(tx *btcutil.Tx, block *btcws.BlockDetails) {
 		}
 	}
 	tx.SetIndex(index)
-	tx.SetOffset(offset)
+	tx.SetOffset(offset) // ppc:
 	c.enqueueNotification <- RecvTx{tx, blk}
 }
 
 func (c *Client) onRedeemingTx(tx *btcutil.Tx, block *btcws.BlockDetails) {
 	var blk *txstore.Block
 	index := btcutil.TxIndexUnknown
-	offset := btcutil.TxOffsetUnknown
+	offset := btcutil.TxOffsetUnknown // ppc:
 	if block != nil {
 		var err error
 		blk, index, offset, err = parseBlock(block)
@@ -236,7 +237,7 @@ func (c *Client) onRedeemingTx(tx *btcutil.Tx, block *btcws.BlockDetails) {
 		}
 	}
 	tx.SetIndex(index)
-	tx.SetOffset(offset)
+	tx.SetOffset(offset) // ppc:
 	c.enqueueNotification <- RedeemingTx{tx, blk}
 }
 

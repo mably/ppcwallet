@@ -237,6 +237,16 @@ func (b *blockTxCollection) ReadFrom(r io.Reader) (int64, error) {
 		return n64, err
 	}
 	b.Height = int32(byteOrder.Uint32(uint32Bytes))
+	// ppc: peercoin block stake modifier for minting
+	n, err = io.ReadFull(r, uint64Bytes)
+	n64 += int64(n)
+	if err != nil {
+		if err == io.EOF {
+			err = io.ErrUnexpectedEOF
+		}
+		return n64, err
+	}
+	b.StakeModifier = byteOrder.Uint64(uint64Bytes)
 
 	// Read amount deltas as a result of transactions in this block.  This
 	// is the net total spendable balance as a result of transaction debits
@@ -314,6 +324,13 @@ func (b *blockTxCollection) WriteTo(w io.Writer) (int64, error) {
 	}
 	byteOrder.PutUint32(uint32Bytes, uint32(b.Height))
 	n, err = w.Write(uint32Bytes)
+	n64 += int64(n)
+	if err != nil {
+		return n64, err
+	}
+	// ppc: peercoin block stake modifier for minting
+	byteOrder.PutUint64(uint64Bytes, b.StakeModifier)
+	n, err = w.Write(uint64Bytes)
 	n64 += int64(n)
 	if err != nil {
 		return n64, err
