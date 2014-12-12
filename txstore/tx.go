@@ -571,6 +571,7 @@ func (s *Store) InsertTx(tx *btcutil.Tx, block *Block) (*TxRecord, error) {
 	// unconfirmed, move it to a block.
 	if r, ok := s.unconfirmed.txs[*tx.Sha()]; ok {
 		r.Tx().SetIndex(tx.Index())
+		r.Tx().SetOffset(tx.Offset()) // ppc:
 		if err := s.moveMinedTx(r, block); err != nil {
 			return nil, err
 		}
@@ -859,6 +860,7 @@ func (s *Store) Rollback(height int32) error {
 			}
 
 			r.Tx().SetIndex(btcutil.TxIndexUnknown)
+			r.Tx().SetOffset(btcutil.TxOffsetUnknown) // ppc:
 			s.unconfirmed.txs[*r.Tx().Sha()] = r
 			for _, input := range r.Tx().MsgTx().TxIn {
 				op := input.PreviousOutPoint

@@ -407,6 +407,14 @@ func (t *txRecord) ReadFrom(r io.Reader) (int64, error) {
 	}
 	txIndex := int(byteOrder.Uint32(uint32Bytes))
 
+	// ppc: Read transaction offset (as a uint32).
+	n, err = io.ReadFull(r, uint32Bytes)
+	n64 = int64(n)
+	if err != nil {
+		return n64, err
+	}
+	txOffset := byteOrder.Uint32(uint32Bytes)
+
 	// Deserialize transaction.
 	msgTx := new(msgTx)
 	tmpn64, err := msgTx.ReadFrom(r)
@@ -421,6 +429,7 @@ func (t *txRecord) ReadFrom(r io.Reader) (int64, error) {
 	// Create and save the btcutil.Tx of the read MsgTx and set its index.
 	tx := btcutil.NewTx((*btcwire.MsgTx)(msgTx))
 	tx.SetIndex(txIndex)
+	tx.SetOffset(txOffset)
 	t.tx = tx
 
 	// Read identifier for existance of debits.
@@ -614,6 +623,14 @@ func (t *txRecord) WriteTo(w io.Writer) (int64, error) {
 	byteOrder.PutUint32(uint32Bytes, uint32(t.tx.Index()))
 	n, err := w.Write(uint32Bytes)
 	n64 := int64(n)
+	if err != nil {
+		return n64, err
+	}
+
+	// ppc: Write transaction offset (as a uint32).
+	byteOrder.PutUint32(uint32Bytes, t.tx.Offset())
+	n, err = w.Write(uint32Bytes)
+	n64 = int64(n)
 	if err != nil {
 		return n64, err
 	}

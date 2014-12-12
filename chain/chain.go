@@ -175,20 +175,20 @@ type (
 // parseBlock parses a btcws definition of the block a tx is mined it to the
 // Block structure of the txstore package, and the block index.  This is done
 // here since btcrpcclient doesn't parse this nicely for us.
-func parseBlock(block *btcws.BlockDetails) (blk *txstore.Block, idx int, err error) {
+func parseBlock(block *btcws.BlockDetails) (blk *txstore.Block, idx int, offset uint32, err error) { // ppc: tx offset return value added
 	if block == nil {
-		return nil, btcutil.TxIndexUnknown, nil
+		return nil, btcutil.TxIndexUnknown, btcutil.TxOffsetUnknown, nil
 	}
 	blksha, err := btcwire.NewShaHashFromStr(block.Hash)
 	if err != nil {
-		return nil, btcutil.TxIndexUnknown, err
+		return nil, btcutil.TxIndexUnknown, btcutil.TxOffsetUnknown, err
 	}
 	blk = &txstore.Block{
 		Height: block.Height,
 		Hash:   *blksha,
 		Time:   time.Unix(block.Time, 0),
 	}
-	return blk, block.Index, nil
+	return blk, block.Index, block.Offset, nil
 }
 
 func (c *Client) onClientConnect() {
@@ -207,9 +207,10 @@ func (c *Client) onBlockDisconnected(hash *btcwire.ShaHash, height int32) {
 func (c *Client) onRecvTx(tx *btcutil.Tx, block *btcws.BlockDetails) {
 	var blk *txstore.Block
 	index := btcutil.TxIndexUnknown
+	offset := btcutil.TxOffsetUnknown
 	if block != nil {
 		var err error
-		blk, index, err = parseBlock(block)
+		blk, index, offset, err = parseBlock(block)
 		if err != nil {
 			// Log and drop improper notification.
 			log.Errorf("recvtx notification bad block: %v", err)
@@ -217,15 +218,17 @@ func (c *Client) onRecvTx(tx *btcutil.Tx, block *btcws.BlockDetails) {
 		}
 	}
 	tx.SetIndex(index)
+	tx.SetOffset(offset)
 	c.enqueueNotification <- RecvTx{tx, blk}
 }
 
 func (c *Client) onRedeemingTx(tx *btcutil.Tx, block *btcws.BlockDetails) {
 	var blk *txstore.Block
 	index := btcutil.TxIndexUnknown
+	offset := btcutil.TxOffsetUnknown
 	if block != nil {
 		var err error
-		blk, index, err = parseBlock(block)
+		blk, index, offset, err = parseBlock(block)
 		if err != nil {
 			// Log and drop improper notification.
 			log.Errorf("redeemingtx notification bad block: %v", err)
@@ -233,6 +236,7 @@ func (c *Client) onRedeemingTx(tx *btcutil.Tx, block *btcws.BlockDetails) {
 		}
 	}
 	tx.SetIndex(index)
+	tx.SetOffset(offset)
 	c.enqueueNotification <- RedeemingTx{tx, blk}
 }
 
