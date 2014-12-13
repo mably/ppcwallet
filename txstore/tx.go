@@ -130,7 +130,7 @@ type Block struct {
 	Hash   btcwire.ShaHash
 	Time   time.Time
 	Height int32
-	StakeModifier uint64
+	KernelStakeModifier uint64
 }
 
 // Debits is the type representing any TxRecord which debits from previous

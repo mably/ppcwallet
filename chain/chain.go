@@ -187,7 +187,7 @@ func parseBlock(block *btcws.BlockDetails) (blk *txstore.Block, idx int, offset 
 		Height: block.Height,
 		Hash:   *blksha,
 		Time:   time.Unix(block.Time, 0),
-		StakeModifier: block.StakeModifier, // ppc:
+		KernelStakeModifier: btcutil.KernelStakeModifierUnknown, // ppc:
 	}
 	return blk, block.Index, block.Offset, nil
 }

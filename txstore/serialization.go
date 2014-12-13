@@ -246,7 +246,7 @@ func (b *blockTxCollection) ReadFrom(r io.Reader) (int64, error) {
 		}
 		return n64, err
 	}
-	b.StakeModifier = byteOrder.Uint64(uint64Bytes)
+	b.KernelStakeModifier = byteOrder.Uint64(uint64Bytes)
 
 	// Read amount deltas as a result of transactions in this block.  This
 	// is the net total spendable balance as a result of transaction debits
@@ -329,7 +329,7 @@ func (b *blockTxCollection) WriteTo(w io.Writer) (int64, error) {
 		return n64, err
 	}
 	// ppc: peercoin block stake modifier for minting
-	byteOrder.PutUint64(uint64Bytes, b.StakeModifier)
+	byteOrder.PutUint64(uint64Bytes, b.KernelStakeModifier)
 	n, err = w.Write(uint64Bytes)
 	n64 += int64(n)
 	if err != nil {
