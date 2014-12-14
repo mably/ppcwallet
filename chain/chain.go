@@ -24,10 +24,10 @@ import (
 	"github.com/mably/btcnet"
 	"github.com/mably/btcrpcclient"
 	"github.com/mably/btcutil"
-	"github.com/mably/ppcwallet/keystore"
-	"github.com/mably/ppcwallet/txstore"
 	"github.com/mably/btcwire"
 	"github.com/mably/btcws"
+	"github.com/mably/ppcwallet/keystore"
+	"github.com/mably/ppcwallet/txstore"
 )
 
 type Client struct {
@@ -184,9 +184,9 @@ func parseBlock(block *btcws.BlockDetails) (blk *txstore.Block, idx int, offset 
 		return nil, btcutil.TxIndexUnknown, btcutil.TxOffsetUnknown, err
 	}
 	blk = &txstore.Block{
-		Height: block.Height,
-		Hash:   *blksha,
-		Time:   time.Unix(block.Time, 0),
+		Height:              block.Height,
+		Hash:                *blksha,
+		Time:                time.Unix(block.Time, 0),
 		KernelStakeModifier: btcutil.KernelStakeModifierUnknown, // ppc:
 	}
 	return blk, block.Index, block.Offset, nil
