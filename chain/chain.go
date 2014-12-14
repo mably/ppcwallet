@@ -294,6 +294,9 @@ out:
 		case dequeue <- next:
 			if n, ok := next.(BlockConnected); ok {
 				bs = (*keystore.BlockStamp)(&n)
+				// ppc: TODO(mably)
+				target, _ := c.GetNextRequiredTarget(true)
+				log.Infof("Next required target : %v", target)
 			}
 
 			notifications[0] = nil
