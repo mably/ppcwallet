@@ -52,6 +52,9 @@ func (w *Wallet) CreateCoinStake(fromTime int64) (err error) {
 	nMaxStakeSearchInterval := int64(60)
 
 	for _, eligible := range eligibles {
+		if w.ShuttingDown() {
+			return
+		}
 		var block *txstore.Block
 		block, err = eligible.Block()
 		if err != nil {
@@ -75,6 +78,9 @@ func (w *Wallet) CreateCoinStake(fromTime int64) (err error) {
 		}
 		tx := eligible.Tx()
 		for n := int64(0); n < 60 && !fKernelFound; n++ {
+			if w.ShuttingDown() {
+				return
+			}
 			stpl := umint.StakeKernelTemplate{
 				//BlockFromTime:  int64(utx.BlockTime),
 				BlockFromTime: block.Time.Unix(),
@@ -168,6 +174,9 @@ func (w *Wallet) findStake(maxTime int64, diff float32) (foundStakes []FoundStak
 	nMaxStakeSearchInterval := int64(60)
 
 	for _, eligible := range eligibles {
+		if w.ShuttingDown() {
+			return
+		}
 		var block *txstore.Block
 		block, err = eligible.Block()
 		if err != nil {
@@ -189,6 +198,10 @@ func (w *Wallet) findStake(maxTime int64, diff float32) (foundStakes []FoundStak
 				w.TxStore.MarkDirty()
 			}
 		}
+
+		scriptClass, addresses, _, _ := eligible.Addresses(params)
+		log.Infof("Addresses: %v (%v)", addresses, scriptClass)
+
 		tx := eligible.Tx()
 
 		log.Infof("CHECK %v PPCs from %v https://bkchain.org/ppc/tx/%v#o%v",
@@ -216,6 +229,9 @@ func (w *Wallet) findStake(maxTime int64, diff float32) (foundStakes []FoundStak
 		}
 
 		for true {
+			if w.ShuttingDown() {
+				return
+			}
 			_, succ, ferr, minTarget := umint.CheckStakeKernelHash(&stpl)
 			if ferr != nil {
 				err = fmt.Errorf("check kernel hash error :%v", ferr)
@@ -251,7 +267,7 @@ func FindStake(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interface{}
 	for _, foundStake := range foundStakes {
 		jsonResult := btcws.FindStakeResult{
 			Difficulty: foundStake.difficulty,
-			Time: foundStake.time,
+			Time:       foundStake.time,
 		}
 		stakesResult = append(stakesResult, jsonResult)
 	}
