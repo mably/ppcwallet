@@ -38,6 +38,8 @@ type Client struct {
 	dequeueNotification chan interface{}
 	currentBlock        chan *keystore.BlockStamp
 
+	currentTarget chan uint32 // ppc:
+
 	// Notification channels regarding the state of the client.  These exist
 	// so other components can listen in on chain activity.  These are
 	// initialized as nil, and must be created by calling one of the Listen*
@@ -59,6 +61,7 @@ func NewClient(net *btcnet.Params, connect, user, pass string, certs []byte) (*C
 		currentBlock:        make(chan *keystore.BlockStamp),
 		notificationLock:    new(sync.Mutex),
 		quit:                make(chan struct{}),
+		currentTarget:       make(chan uint32),
 	}
 	ntfnCallbacks := btcrpcclient.NotificationHandlers{
 		OnClientConnected:   client.onClientConnect,
@@ -271,6 +274,7 @@ func (c *Client) handler() {
 	enqueue := c.enqueueNotification
 	var dequeue chan interface{}
 	var next interface{}
+	var target uint32 // ppc:
 out:
 	for {
 		select {
@@ -295,8 +299,12 @@ out:
 			if n, ok := next.(BlockConnected); ok {
 				bs = (*keystore.BlockStamp)(&n)
 				// ppc: TODO(mably)
-				target, _ := c.GetNextRequiredTarget(true)
-				log.Infof("Next required target : %v", target)
+				target, err = c.GetNextRequiredTarget(true)
+				if err == nil {
+					log.Infof("Next required target: %v", target)
+				} else {
+					log.Errorf("Error getting next required target: %v", err)
+				}
 			}
 
 			notifications[0] = nil
@@ -313,6 +321,8 @@ out:
 			}
 
 		case c.currentBlock <- bs:
+
+		case c.currentTarget <- target:
 
 		case <-c.quit:
 			break out

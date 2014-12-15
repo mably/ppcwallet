@@ -9,10 +9,15 @@ import (
 	"github.com/mably/ppcwallet/txstore"
 )
 
-func (w *Wallet) CreateCoinStake(bits uint32, fromTime int64) (err error) {
+func (w *Wallet) CreateCoinStake(fromTime int64) (err error) {
 
 	// Get current block's height and hash.
 	bs, err := w.chainSvr.BlockStamp()
+	if err != nil {
+		return
+	}
+
+	bits, err := w.chainSvr.CurrentTarget()
 	if err != nil {
 		return
 	}
