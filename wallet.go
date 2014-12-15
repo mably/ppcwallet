@@ -29,10 +29,10 @@ import (
 	"github.com/mably/btcjson"
 	"github.com/mably/btcnet"
 	"github.com/mably/btcutil"
+	"github.com/mably/btcwire"
 	"github.com/mably/ppcwallet/chain"
 	"github.com/mably/ppcwallet/keystore"
 	"github.com/mably/ppcwallet/txstore"
-	"github.com/mably/btcwire"
 )
 
 var (
@@ -103,6 +103,8 @@ type Wallet struct {
 	confirmedBalance   chan btcutil.Amount
 	unconfirmedBalance chan btcutil.Amount
 	notificationLock   sync.Locker
+
+	minter *Minter
 
 	wg   sync.WaitGroup
 	quit chan struct{}
@@ -368,6 +370,9 @@ func (w *Wallet) Start(chainServer *chain.Client) {
 	go w.rescanProgressHandler()
 	go w.rescanRPCHandler()
 
+	w.minter = newMinter(w) // ppc:
+	go w.minter.Start() // ppc:
+
 	go func() {
 		err := w.syncWithChain()
 		if err != nil && !w.ShuttingDown() {
@@ -382,6 +387,8 @@ func (w *Wallet) Stop() {
 	case <-w.quit:
 	default:
 		close(w.quit)
+		// ppc: Stop the minter if needed
+		w.minter.Stop()
 		w.chainSvrLock.Lock()
 		if w.chainSvr != nil {
 			w.chainSvr.Stop()

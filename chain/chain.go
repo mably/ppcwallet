@@ -61,7 +61,7 @@ func NewClient(net *btcnet.Params, connect, user, pass string, certs []byte) (*C
 		currentBlock:        make(chan *keystore.BlockStamp),
 		notificationLock:    new(sync.Mutex),
 		quit:                make(chan struct{}),
-		currentTarget:       make(chan uint32),
+		currentTarget:       make(chan uint32), // ppc:
 	}
 	ntfnCallbacks := btcrpcclient.NotificationHandlers{
 		OnClientConnected:   client.onClientConnect,
@@ -301,7 +301,7 @@ out:
 				// ppc: TODO(mably)
 				target, err = c.GetNextRequiredTarget(true)
 				if err == nil {
-					log.Infof("Next required target: %v", target)
+					log.Infof("Next required target received: %v", target)
 				} else {
 					log.Errorf("Error getting next required target: %v", err)
 				}
