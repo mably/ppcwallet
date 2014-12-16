@@ -118,7 +118,7 @@ func (w *Wallet) CreateCoinStake(fromTime int64) (err error) {
 		}
 	}
 
-	log.Infof("Credit available: %v / %v", nCredit, nBalance)
+	//log.Infof("Credit available: %v / %v", nCredit, nBalance)
 
 	if nCredit <= 0 || nCredit > nBalance {
 		return
@@ -156,6 +156,8 @@ func (w *Wallet) findStake(maxTime int64, diff float32) (foundStakes []FoundStak
 	if diff != 0 {
 		bits = umint.BigToCompact(umint.DiffToTarget(diff))
 	}
+
+	log.Infof("Required difficulty: %v (%v)", umint.CompactToDiff(bits), bits)
 
 	eligibles, err := w.findEligibleOutputs(6, bs)
 
@@ -258,7 +260,7 @@ func (w *Wallet) findStake(maxTime int64, diff float32) (foundStakes []FoundStak
 func FindStake(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interface{}, error) {
 	cmd := icmd.(*btcws.FindStakeCmd)
 
-	foundStakes, err := w.findStake(cmd.MaxTime, 0)
+	foundStakes, err := w.findStake(cmd.MaxTime, cmd.Difficulty)
 	if err != nil {
 		return nil, err
 	}

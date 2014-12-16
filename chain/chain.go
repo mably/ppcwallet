@@ -261,6 +261,13 @@ func (c *Client) handler() {
 		c.wg.Done()
 	}
 
+	// ppc:
+	target, err := c.GetNextRequiredTarget(true)
+	if err != nil {
+		close(c.quit)
+		c.wg.Done()
+	}
+
 	bs := &keystore.BlockStamp{Hash: hash, Height: height}
 
 	// TODO: Rather than leaving this as an unbounded queue for all types of
@@ -274,7 +281,6 @@ func (c *Client) handler() {
 	enqueue := c.enqueueNotification
 	var dequeue chan interface{}
 	var next interface{}
-	var target uint32 // ppc:
 out:
 	for {
 		select {
