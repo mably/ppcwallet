@@ -51,6 +51,7 @@ func (w *Wallet) CreateCoinStake(fromTime int64) (err error) {
 
 	nStakeMinAge := params.StakeMinAge
 	nMaxStakeSearchInterval := int64(60)
+	StakeMinAmount, _ := btcutil.NewAmount(1.0)
 
 	for _, eligible := range eligibles {
 		if w.ShuttingDown() {
@@ -60,6 +61,9 @@ func (w *Wallet) CreateCoinStake(fromTime int64) (err error) {
 		block, err = eligible.Block()
 		if err != nil {
 			return
+		}
+		if eligible.Amount() < StakeMinAmount {
+			continue // only count coins meeting min amount requirement
 		}
 		if block.Time.Unix()+nStakeMinAge > txNew.Time.Unix()-nMaxStakeSearchInterval {
 			continue // only count coins meeting min age requirement
@@ -175,6 +179,7 @@ func (w *Wallet) findStake(maxTime int64, diff float64) (foundStakes []FoundStak
 
 	nStakeMinAge := params.StakeMinAge
 	nMaxStakeSearchInterval := int64(60)
+	StakeMinAmount, _ := btcutil.NewAmount(1.0)
 
 	for _, eligible := range eligibles {
 		if w.ShuttingDown() {
@@ -184,6 +189,9 @@ func (w *Wallet) findStake(maxTime int64, diff float64) (foundStakes []FoundStak
 		block, err = eligible.Block()
 		if err != nil {
 			return
+		}
+		if eligible.Amount() < StakeMinAmount {
+			continue // only count coins meeting min amount requirement
 		}
 		if block.Time.Unix()+nStakeMinAge > fromTime-nMaxStakeSearchInterval {
 			continue // only count coins meeting min age requirement
