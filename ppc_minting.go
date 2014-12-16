@@ -54,13 +54,13 @@ func (m *Minter) Stop() {
 	}
 
 	close(m.quit)
+	m.wg.Wait()
 	m.started = false
 	log.Infof("Minter stopped")
 }
 
 // WaitForShutdown blocks until all minter goroutines have finished executing.
 func (m *Minter) WaitForShutdown() {
-	m.wg.Wait()
 }
 
 // mintBlocks is a worker that is controlled by the miningWorkerController.
