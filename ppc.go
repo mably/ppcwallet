@@ -13,6 +13,7 @@ import (
 	"github.com/mably/btcutil"
 	"github.com/mably/btcwire"
 	"github.com/mably/btcws"
+	"github.com/mably/ppcutil"
 	"github.com/mably/ppcwallet/chain"
 	"github.com/mably/ppcwallet/txstore"
 )
@@ -130,11 +131,11 @@ func (w *Wallet) CreateCoinStake(fromTime int64) (err error) {
 }
 
 type FoundStake struct {
-	difficulty float32
+	difficulty float64
 	time       int64
 }
 
-func (w *Wallet) findStake(maxTime int64, diff float32) (foundStakes []FoundStake, err error) {
+func (w *Wallet) findStake(maxTime int64, diff float64) (foundStakes []FoundStake, err error) {
 
 	// Get NetParams
 	params, err := w.chainSvr.Params()
@@ -154,10 +155,10 @@ func (w *Wallet) findStake(maxTime int64, diff float32) (foundStakes []FoundStak
 	}
 
 	if diff != 0 {
-		bits = umint.BigToCompact(umint.DiffToTarget(diff))
+		bits = umint.BigToCompact(ppcutil.DifficultyToTarget(diff))
 	}
 
-	log.Infof("Required difficulty: %v (%v)", umint.CompactToDiff(bits), bits)
+	log.Infof("Required difficulty: %v (%v)", ppcutil.TargetToDifficulty(bits), bits)
 
 	eligibles, err := w.findEligibleOutputs(6, bs)
 
@@ -241,9 +242,8 @@ func (w *Wallet) findStake(maxTime int64, diff float32) (foundStakes []FoundStak
 			}
 			if succ {
 				comp := umint.IncCompact(umint.BigToCompact(minTarget))
-				maximumDiff := umint.CompactToDiff(comp)
-				log.Infof("MINT %v %v", time.Unix(stpl.TxTime, 0),
-					maximumDiff)
+				maximumDiff := ppcutil.TargetToDifficulty(comp)
+				log.Infof("MINT %v %v", time.Unix(stpl.TxTime, 0), maximumDiff)
 				foundStakes = append(foundStakes, FoundStake{maximumDiff, stpl.TxTime})
 			}
 			stpl.TxTime++
