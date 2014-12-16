@@ -67,6 +67,9 @@ func (m *Minter) Stop() {
 //
 // It must be run as a goroutine.
 func (m *Minter) mintBlocks() {
+
+	defer m.wg.Done()
+
 	log.Tracef("Starting minting blocks worker")
 
 out:
@@ -94,8 +97,6 @@ out:
 
 		time.Sleep(time.Millisecond * 500)
 	}
-
-	m.wg.Done()
 
 	log.Tracef("Minting blocks worker done")
 }
