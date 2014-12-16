@@ -104,7 +104,7 @@ type Wallet struct {
 	unconfirmedBalance chan btcutil.Amount
 	notificationLock   sync.Locker
 
-	minter *Minter
+	minter     *Minter
 
 	wg   sync.WaitGroup
 	quit chan struct{}
@@ -370,8 +370,9 @@ func (w *Wallet) Start(chainServer *chain.Client) {
 	go w.rescanProgressHandler()
 	go w.rescanRPCHandler()
 
-	w.minter = newMinter(w) // ppc:
-	go w.minter.Start() // ppc:
+	// ppc:
+	w.minter = newMinter(w)
+	go w.minter.Start()
 
 	go func() {
 		err := w.syncWithChain()
@@ -388,7 +389,9 @@ func (w *Wallet) Stop() {
 	default:
 		close(w.quit)
 		// ppc: Stop the minter if needed
-		w.minter.Stop()
+		if w.minter != nil {
+			w.minter.Stop()
+		}
 		w.chainSvrLock.Lock()
 		if w.chainSvr != nil {
 			w.chainSvr.Stop()
@@ -410,6 +413,9 @@ func (w *Wallet) ShuttingDown() bool {
 
 // WaitForShutdown blocks until all wallet goroutines have finished executing.
 func (w *Wallet) WaitForShutdown() {
+	if w.minter != nil {
+		w.minter.WaitForShutdown()
+	}
 	w.chainSvrLock.Lock()
 	if w.chainSvr != nil {
 		w.chainSvr.WaitForShutdown()
