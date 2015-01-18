@@ -8,7 +8,7 @@ ppcwallet
 ppcwallet is a daemon handling bitcoin wallet functionality for a
 single user.  It acts as both an RPC client to ppcd and an RPC server
 for wallet clients and legacy RPC applications.  It is based on the
-Conformal [btcwallet](https://github.com/conformal/btcwallet) code.
+Conformal [btcwallet](https://github.com/btcsuite/btcwallet) code.
 
 The wallet file format is based on
 [Armory](https://github.com/etotheipi/BitcoinArmory) and provides a
@@ -26,7 +26,7 @@ can be found [here](https://github.com/mably/ppcd).
 As a daemon, ppcwallet provides no user interface and an additional
 graphical or command line client is required for normal, personal
 wallet usage.  Conformal has written
-[btcgui](https://github.com/conformal/btcgui) as a graphical client
+[btcgui](https://github.com/btcsuite/btcgui) as a graphical client
 to btcwallet. It has not been ported to ppcwallet yet.
 
 This project is currently under active development is not production

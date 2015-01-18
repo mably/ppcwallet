@@ -24,7 +24,7 @@ import (
 
 	"github.com/mably/ppcwallet/walletdb"
 	"github.com/mably/btcwire"
-	"github.com/conformal/fastsha256"
+	"github.com/btcsuite/fastsha256"
 )
 
 const (

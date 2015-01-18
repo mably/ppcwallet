@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/conformal/btcec"
+	"github.com/btcsuite/btcec"
 	"github.com/mably/btcnet"
 	"github.com/mably/btcutil"
 	"github.com/mably/btcutil/hdkeychain"

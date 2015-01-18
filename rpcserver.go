@@ -37,17 +37,18 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/conformal/btcec"
+	"github.com/btcsuite/btcec"
+	"github.com/btcsuite/websocket"
 	"github.com/mably/btcjson"
 	"github.com/mably/btcrpcclient"
 	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
+	"github.com/mably/btcwire"
+	"github.com/mably/btcws"
 	"github.com/mably/ppcwallet/chain"
 	"github.com/mably/ppcwallet/keystore"
 	"github.com/mably/ppcwallet/txstore"
-	"github.com/mably/btcwire"
-	"github.com/mably/btcws"
-	"github.com/conformal/websocket"
+
 )
 
 // Error types to simplify the reporting of specific categories of

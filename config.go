@@ -26,7 +26,7 @@ import (
 
 	"github.com/mably/btcutil"
 	"github.com/mably/btcwire"
-	"github.com/conformal/go-flags"
+	"github.com/btcsuite/go-flags"
 )
 
 const (

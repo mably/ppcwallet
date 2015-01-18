@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/conformal/btclog"
+	"github.com/btcsuite/btclog"
 	"github.com/mably/ppcwallet/chain"
 	"github.com/mably/ppcwallet/txstore"
-	"github.com/conformal/seelog"
+	"github.com/btcsuite/seelog"
 )
 
 const (
