@@ -1,6 +1,6 @@
 PASS
 coverage: 100.0% of statements
-ok  	github.com/conformal/btcwallet/walletdb	0.130s
+ok  	github.com/btcsuite/btcwallet/walletdb	0.130s
 github.com\conformal\btcwallet\walletdb\interface.go:190:	RegisterDriver		100.0%
 github.com\conformal\btcwallet\walletdb\interface.go:201:	SupportedDrivers	100.0%
 github.com\conformal\btcwallet\walletdb\interface.go:214:	Create			100.0%
@@ -9,7 +9,7 @@ total:								(statements)		100.0%
 ============================================================
 PASS
 coverage: 91.7% of statements
-ok  	github.com/conformal/btcwallet/walletdb/bdb	0.149s
+ok  	github.com/btcsuite/btcwallet/walletdb/bdb	0.149s
 github.com\conformal\btcwallet\walletdb\bdb\db.go:28:		convertErr		76.9%
 github.com\conformal\btcwallet\walletdb\bdb\db.go:74:		Bucket			100.0%
 github.com\conformal\btcwallet\walletdb\bdb\db.go:90:		CreateBucket		100.0%

@@ -37,8 +37,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/conformal/btcec"
-	"github.com/conformal/websocket"
+	"github.com/btcsuite/btcec"
+	"github.com/btcsuite/websocket"
 	"github.com/mably/btcjson"
 	"github.com/mably/btcrpcclient"
 	"github.com/mably/btcscript"
