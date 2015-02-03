@@ -25,9 +25,9 @@ import (
 	"time"
 
 	"github.com/mably/btcnet"
-	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
 	"github.com/mably/btcwire"
+	"github.com/mably/ppcd/txscript"
 )
 
 var (
@@ -666,7 +666,7 @@ func (s *Store) findPreviousCredits(tx *btcutil.Tx) ([]Credit, error) {
 	inputs := tx.MsgTx().TxIn
 	creditChans := make([]chan createdCredit, len(inputs))
 	for i, txIn := range inputs {
-		creditChans[i] = make(chan createdCredit)
+		creditChans[i] = make(chan createdCredit, 1)
 		go func(i int, op btcwire.OutPoint) {
 			key, ok := s.unspent[op]
 			if !ok {
@@ -1095,7 +1095,7 @@ func (s *Store) unspentOutputs() ([]Credit, error) {
 	creditChans := make([]chan createdCredit, len(s.unspent))
 	i := 0
 	for op, key := range s.unspent {
-		creditChans[i] = make(chan createdCredit)
+		creditChans[i] = make(chan createdCredit, 1)
 		go func(i int, key BlockTxKey, opIndex uint32) {
 			r, err := s.lookupBlockTx(key)
 			if err != nil {
@@ -1424,7 +1424,7 @@ func (d Debits) Fee() btcutil.Amount {
 
 // Addresses parses the pubkey script, extracting all addresses for a
 // standard script.
-func (c Credit) Addresses(net *btcnet.Params) (btcscript.ScriptClass,
+func (c Credit) Addresses(net *btcnet.Params) (txscript.ScriptClass,
 	[]btcutil.Address, int, error) {
 
 	c.s.mtx.RLock()
@@ -1432,7 +1432,7 @@ func (c Credit) Addresses(net *btcnet.Params) (btcscript.ScriptClass,
 
 	msgTx := c.Tx().MsgTx()
 	pkScript := msgTx.TxOut[c.OutputIndex].PkScript
-	return btcscript.ExtractPkScriptAddrs(pkScript, net)
+	return txscript.ExtractPkScriptAddrs(pkScript, net)
 }
 
 // Change returns whether the credit is the result of a change output.

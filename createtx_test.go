@@ -94,13 +94,13 @@ func TestCreateTx(t *testing.T) {
 	// Given the input (15e6 + 10e6 + 1e7) and requested output (15e6 + 10e6)
 	// amounts in the new TX, we should have a change output with 8.99e6, which
 	// implies a fee of 1e4 satoshis.
-	expectedChange := btcutil.Amount(8.99e6)
+	expectedChange := btcutil.Amount(8.999e6)
 
 	outputs[changeAddr.String()] = expectedChange
 	checkOutputsMatch(t, msgTx, outputs)
 
 	minFee := feeForSize(defaultFeeIncrement, msgTx.SerializeSize())
-	actualFee := btcutil.Amount(1e4)
+	actualFee := btcutil.Amount(1e3)
 	if minFee > actualFee {
 		t.Fatalf("Requested fee (%v) for tx size higher than actual fee (%v)", minFee, actualFee)
 	}
@@ -133,7 +133,7 @@ func checkOutputsMatch(t *testing.T, msgtx *btcwire.MsgTx, expected map[string]b
 		if err != nil {
 			t.Fatalf("Cannot decode address: %v", err)
 		}
-		pkScript, err := btcscript.PayToAddrScript(addr)
+		pkScript, err := txscript.PayToAddrScript(addr)
 		if err != nil {
 			t.Fatalf("Cannot create pkScript: %v", err)
 		}

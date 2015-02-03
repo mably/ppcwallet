@@ -112,7 +112,7 @@ func TestFakeTxs(t *testing.T) {
 		28, 29, 30, 31, 32})
 	out := btcwire.NewOutPoint(&ophash, 0)
 	utxo.Out = tx.OutPoint(*out)
-	ss, err := btcscript.PayToAddrScript(addr)
+	ss, err := txscript.PayToAddrScript(addr)
 	if err != nil {
 		t.Errorf("Could not create utxo PkScript: %s", err)
 		return

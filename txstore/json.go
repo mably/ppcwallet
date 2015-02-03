@@ -19,8 +19,8 @@ package txstore
 import (
 	"github.com/mably/btcjson"
 	"github.com/mably/btcnet"
-	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
+	"github.com/mably/ppcd/txscript"
 )
 
 // ToJSON returns a slice of btcjson listtransactions result types for all credits
@@ -68,7 +68,7 @@ func (d Debits) toJSON(account string, chainHeight int32,
 
 	for _, txOut := range msgTx.TxOut {
 		address := ""
-		_, addrs, _, _ := btcscript.ExtractPkScriptAddrs(txOut.PkScript, net)
+		_, addrs, _, _ := txscript.ExtractPkScriptAddrs(txOut.PkScript, net)
 		if len(addrs) == 1 {
 			address = addrs[0].EncodeAddress()
 		}
@@ -168,7 +168,7 @@ func (c Credit) toJSON(account string, chainHeight int32,
 	txout := msgTx.TxOut[c.OutputIndex]
 
 	var address string
-	_, addrs, _, _ := btcscript.ExtractPkScriptAddrs(txout.PkScript, net)
+	_, addrs, _, _ := txscript.ExtractPkScriptAddrs(txout.PkScript, net)
 	if len(addrs) == 1 {
 		address = addrs[0].EncodeAddress()
 	}

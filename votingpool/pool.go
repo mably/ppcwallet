@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
 	"github.com/mably/btcutil/hdkeychain"
+	"github.com/mably/ppcd/txscript"
 	"github.com/mably/ppcwallet/waddrmgr"
 	"github.com/mably/ppcwallet/walletdb"
 )
@@ -521,7 +521,7 @@ func (vp *Pool) DepositScript(seriesID, branch, index uint32) ([]byte, error) {
 		}
 	}
 
-	script, err := btcscript.MultiSigScript(pks, int(series.reqSigs))
+	script, err := txscript.MultiSigScript(pks, int(series.reqSigs))
 	if err != nil {
 		str := fmt.Sprintf("error while making multisig script hash, %d", len(pks))
 		return nil, managerError(waddrmgr.ErrScriptCreation, str, err)
