@@ -25,9 +25,9 @@ import (
 
 	"github.com/btcsuite/btcec"
 	"github.com/mably/btcnet"
-	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
 	"github.com/mably/btcwire"
+	"github.com/mably/ppcd/txscript"
 
 	"github.com/davecgh/go-spew/spew"
 )
