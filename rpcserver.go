@@ -320,6 +320,9 @@ func newRPCServer(listenAddrs []string, maxPost, maxWebsockets int64) (*rpcServe
 	}
 
 	// Check for existence of cert file and key file
+	listenFunc := net.Listen
+	if !cfg.DisableServerTLS {
+		// Check for existence of cert file and key file
 	if !fileExists(cfg.RPCKey) && !fileExists(cfg.RPCCert) {
 		// if both files do not exist, we generate them.
 		err := genCertPair(cfg.RPCCert, cfg.RPCKey)
@@ -334,13 +337,25 @@ func newRPCServer(listenAddrs []string, maxPost, maxWebsockets int64) (*rpcServe
 
 	tlsConfig := tls.Config{
 		Certificates: []tls.Certificate{keypair},
+			MinVersion:   tls.VersionTLS12,
+	}
+
+		// Change the standard net.Listen function to the tls one.
+		listenFunc = func(net string, laddr string) (net.Listener, error) {
+			return tls.Listen(net, laddr, &tlsConfig)
+		}
+	} else {
+		log.Info("Server TLS is disabled")
 	}
 
 	ipv4ListenAddrs, ipv6ListenAddrs, err := parseListeners(listenAddrs)
+	if err != nil {
+		return nil, err
+	}
 	listeners := make([]net.Listener, 0,
 		len(ipv6ListenAddrs)+len(ipv4ListenAddrs))
 	for _, addr := range ipv4ListenAddrs {
-		listener, err := tls.Listen("tcp4", addr, &tlsConfig)
+		listener, err := listenFunc("tcp4", addr)
 		if err != nil {
 			log.Warnf("RPCS: Can't listen on %s: %v", addr,
 				err)
@@ -350,7 +365,7 @@ func newRPCServer(listenAddrs []string, maxPost, maxWebsockets int64) (*rpcServe
 	}
 
 	for _, addr := range ipv6ListenAddrs {
-		listener, err := tls.Listen("tcp6", addr, &tlsConfig)
+		listener, err := listenFunc("tcp6", addr)
 		if err != nil {
 			log.Warnf("RPCS: Can't listen on %s: %v", addr,
 				err)
@@ -1556,7 +1571,7 @@ func makeMultiSigScript(w *Wallet, keys []string, nRequired int) ([]byte, error)
 		}
 	}
 
-	return btcscript.MultiSigScript(keysesPrecious, nRequired)
+	return txscript.MultiSigScript(keysesPrecious, nRequired)
 }
 
 // AddMultiSigAddress handles an addmultisigaddress request by adding a
@@ -1685,7 +1700,12 @@ func GetAddressesByAccount(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) 
 func GetBalance(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interface{}, error) {
 	cmd := icmd.(*btcjson.GetBalanceCmd)
 
-	err := checkAccountName(cmd.Account)
+	var account string
+	if cmd.Account != nil {
+		account = *cmd.Account
+	}
+
+	err := checkAccountName(account)
 	if err != nil {
 		return nil, err
 	}
@@ -2145,7 +2165,12 @@ func ListSinceBlock(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interf
 func ListTransactions(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interface{}, error) {
 	cmd := icmd.(*btcjson.ListTransactionsCmd)
 
-	err := checkAccountName(cmd.Account)
+	var account string
+	if cmd.Account != nil {
+		account = *cmd.Account
+	}
+
+	err := checkAccountName(account)
 	if err != nil {
 		return nil, err
 	}
@@ -2190,7 +2215,12 @@ func ListAddressTransactions(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd
 func ListAllTransactions(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (interface{}, error) {
 	cmd := icmd.(*btcws.ListAllTransactionsCmd)
 
-	err := checkAccountName(cmd.Account)
+	var account string
+	if cmd.Account != nil {
+		account = *cmd.Account
+	}
+
+	err := checkAccountName(account)
 	if err != nil {
 		return nil, err
 	}
@@ -2601,24 +2631,24 @@ func SignRawTransaction(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (in
 		}
 	}
 
-	hashType := btcscript.SigHashAll
+	hashType := txscript.SigHashAll
 	if cmd.Flags != "" {
 		switch cmd.Flags {
 		case "ALL":
-			hashType = btcscript.SigHashAll
+			hashType = txscript.SigHashAll
 		case "NONE":
-			hashType = btcscript.SigHashNone
+			hashType = txscript.SigHashNone
 		case "SINGLE":
-			hashType = btcscript.SigHashSingle
+			hashType = txscript.SigHashSingle
 		case "ALL|ANYONECANPAY":
-			hashType = btcscript.SigHashAll |
-				btcscript.SigHashAnyOneCanPay
+			hashType = txscript.SigHashAll |
+				txscript.SigHashAnyOneCanPay
 		case "NONE|ANYONECANPAY":
-			hashType = btcscript.SigHashNone |
-				btcscript.SigHashAnyOneCanPay
+			hashType = txscript.SigHashNone |
+				txscript.SigHashAnyOneCanPay
 		case "SINGLE|ANYONECANPAY":
-			hashType = btcscript.SigHashSingle |
-				btcscript.SigHashAnyOneCanPay
+			hashType = txscript.SigHashSingle |
+				txscript.SigHashAnyOneCanPay
 		default:
 			e := errors.New("Invalid sighash parameter")
 			return nil, InvalidParameterError{e}
@@ -2666,7 +2696,7 @@ func SignRawTransaction(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (in
 
 		// Set up our callbacks that we pass to btcscript so it can
 		// look up the appropriate keys and scripts by address.
-		getKey := btcscript.KeyClosure(func(addr btcutil.Address) (
+		getKey := txscript.KeyClosure(func(addr btcutil.Address) (
 			*btcec.PrivateKey, bool, error) {
 			if len(keys) != 0 {
 				wif, ok := keys[addr.EncodeAddress()]
@@ -2695,7 +2725,7 @@ func SignRawTransaction(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (in
 			return key, pka.Compressed(), nil
 		})
 
-		getScript := btcscript.ScriptClosure(func(
+		getScript := txscript.ScriptClosure(func(
 			addr btcutil.Address) ([]byte, error) {
 			// If keys were provided then we can only use the
 			// scripts provided with our inputs, too.
@@ -2726,10 +2756,10 @@ func SignRawTransaction(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (in
 		// SigHashSingle inputs can only be signed if there's a
 		// corresponding output. However this could be already signed,
 		// so we always verify the output.
-		if (hashType&btcscript.SigHashSingle) !=
-			btcscript.SigHashSingle || i < len(msgTx.TxOut) {
+		if (hashType&txscript.SigHashSingle) !=
+			txscript.SigHashSingle || i < len(msgTx.TxOut) {
 
-			script, err := btcscript.SignTxOutput(activeNet.Params,
+			script, err := txscript.SignTxOutput(activeNet.Params,
 				msgTx, i, input, hashType, getKey,
 				getScript, txIn.SignatureScript)
 			// Failure to sign isn't an error, it just means that
@@ -2743,9 +2773,9 @@ func SignRawTransaction(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (in
 
 		// Either it was already signed or we just signed it.
 		// Find out if it is completely satisfied or still needs more.
-		flags := btcscript.ScriptBip16 | btcscript.ScriptCanonicalSignatures |
-			btcscript.ScriptStrictMultiSig
-		engine, err := btcscript.NewScript(txIn.SignatureScript, input,
+		flags := txscript.ScriptBip16 | txscript.ScriptCanonicalSignatures |
+			txscript.ScriptStrictMultiSig
+		engine, err := txscript.NewScript(txIn.SignatureScript, input,
 			i, msgTx, flags)
 		if err != nil || engine.Execute() != nil {
 			complete = false
@@ -2807,7 +2837,7 @@ func ValidateAddress(w *Wallet, chainSvr *chain.Client, icmd btcjson.Cmd) (inter
 			class := sa.ScriptClass()
 			// script type
 			result.Script = class.String()
-			if class == btcscript.MultiSigTy {
+			if class == txscript.MultiSigTy {
 				result.SigsRequired = int32(sa.RequiredSigs())
 			}
 		}

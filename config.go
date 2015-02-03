@@ -69,6 +69,8 @@ type config struct {
 	RPCKey           string   `long:"rpckey" description:"File containing the certificate key"`
 	RPCMaxClients    int64    `long:"rpcmaxclients" description:"Max number of RPC clients for standard connections"`
 	RPCMaxWebsockets int64    `long:"rpcmaxwebsockets" description:"Max number of RPC websocket connections"`
+	DisableServerTLS bool     `long:"noservertls" description:"Disable TLS for the RPC server -- NOTE: This is only allowed if the RPC server is bound to localhost"`
+	DisableClientTLS bool     `long:"noclienttls" description:"Disable TLS for the RPC client -- NOTE: This is only allowed if the RPC client is connecting to localhost"`
 	MainNet          bool     `long:"mainnet" description:"Use the main Bitcoin network (default testnet3)"`
 	SimNet           bool     `long:"simnet" description:"Use the simulation test network (default testnet3)"`
 	KeypoolSize      uint     `short:"k" long:"keypoolsize" description:"DEPRECATED -- Maximum number of addresses in keypool"`
@@ -265,9 +267,11 @@ func loadConfig() (*config, []string, error) {
 	}
 
 	// Show the version and exit if the version flag was specified.
-	if preCfg.ShowVersion {
+	funcName := "loadConfig"
 		appName := filepath.Base(os.Args[0])
 		appName = strings.TrimSuffix(appName, filepath.Ext(appName))
+	usageMessage := fmt.Sprintf("Use %s -h to show usage", appName)
+	if preCfg.ShowVersion {
 		fmt.Println(appName, "version", version())
 		os.Exit(0)
 	}
@@ -363,6 +367,26 @@ func loadConfig() (*config, []string, error) {
 	// Add default port to connect flag if missing.
 	cfg.RPCConnect = normalizeAddress(cfg.RPCConnect, activeNet.btcdPort)
 
+	localhostListeners := map[string]struct{}{
+		"localhost": struct{}{},
+		"127.0.0.1": struct{}{},
+		"::1":       struct{}{},
+	}
+	RPCHost, _, err := net.SplitHostPort(cfg.RPCConnect)
+	if err != nil {
+		return nil, nil, err
+	}
+	if cfg.DisableClientTLS {
+		if _, ok := localhostListeners[RPCHost]; !ok {
+			str := "%s: the --noclienttls option may not be used " +
+				"when connecting RPC to non localhost " +
+				"addresses: %s"
+			err := fmt.Errorf(str, funcName, cfg.RPCConnect)
+			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintln(os.Stderr, usageMessage)
+			return nil, nil, err
+		}
+	} else {
 	// If CAFile is unset, choose either the copy or local btcd cert.
 	if cfg.CAFile == "" {
 		cfg.CAFile = filepath.Join(cfg.DataDir, defaultCAFilename)
@@ -370,23 +394,13 @@ func loadConfig() (*config, []string, error) {
 		// If the CA copy does not exist, check if we're connecting to
 		// a local btcd and switch to its RPC cert if it exists.
 		if !fileExists(cfg.CAFile) {
-			host, _, err := net.SplitHostPort(cfg.RPCConnect)
-			if err != nil {
-				return nil, nil, err
-			}
-			switch host {
-			case "localhost":
-				fallthrough
-
-			case "127.0.0.1":
-				fallthrough
-
-			case "::1":
+				if _, ok := localhostListeners[RPCHost]; ok {
 				if fileExists(btcdHomedirCAFile) {
 					cfg.CAFile = btcdHomedirCAFile
 				}
 			}
 		}
+	}
 	}
 
 	if len(cfg.SvrListeners) == 0 {
@@ -405,6 +419,31 @@ func loadConfig() (*config, []string, error) {
 	// duplicate addresses.
 	cfg.SvrListeners = normalizeAddresses(cfg.SvrListeners,
 		activeNet.svrPort)
+
+	// Expand environment variable and leading ~ for filepaths.
+	// addresses.
+	if cfg.DisableServerTLS {
+		for _, addr := range cfg.SvrListeners {
+			host, _, err := net.SplitHostPort(addr)
+			if err != nil {
+				str := "%s: RPC listen interface '%s' is " +
+					"invalid: %v"
+				err := fmt.Errorf(str, funcName, addr, err)
+				fmt.Fprintln(os.Stderr, err)
+				fmt.Fprintln(os.Stderr, usageMessage)
+				return nil, nil, err
+			}
+			if _, ok := localhostListeners[host]; !ok {
+				str := "%s: the --noservertls option may not be used " +
+					"when binding RPC to non localhost " +
+					"addresses: %s"
+				err := fmt.Errorf(str, funcName, addr)
+				fmt.Fprintln(os.Stderr, err)
+				fmt.Fprintln(os.Stderr, usageMessage)
+				return nil, nil, err
+			}
+		}
+	}
 
 	// Expand environment variable and leading ~ for filepaths.
 	cfg.CAFile = cleanAndExpandPath(cfg.CAFile)
