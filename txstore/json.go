@@ -19,8 +19,8 @@ package txstore
 import (
 	"github.com/mably/btcjson"
 	"github.com/mably/btcnet"
-	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
+	"github.com/mably/ppcd/txscript"
 )
 
 // ToJSON returns a slice of btcjson listtransactions result types for all credits

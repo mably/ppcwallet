@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
 	"github.com/mably/btcutil/hdkeychain"
+	"github.com/mably/ppcd/txscript"
 	"github.com/mably/ppcwallet/waddrmgr"
 	"github.com/mably/ppcwallet/walletdb"
 )

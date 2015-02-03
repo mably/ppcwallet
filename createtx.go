@@ -23,8 +23,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
+	"github.com/mably/ppcd/txscript"
 	"github.com/mably/ppcwallet/keystore"
 	"github.com/mably/ppcwallet/txstore"
 	"github.com/mably/btcwire"

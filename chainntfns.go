@@ -17,8 +17,8 @@
 package main
 
 import (
-	"github.com/mably/btcscript"
 	"github.com/mably/btcutil"
+	"github.com/mably/ppcd/txscript"
 	"github.com/mably/ppcwallet/chain"
 	"github.com/mably/ppcwallet/keystore"
 	"github.com/mably/ppcwallet/txstore"
